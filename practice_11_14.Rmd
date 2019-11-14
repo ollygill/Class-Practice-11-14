@@ -1,0 +1,46 @@
+---
+title: "Class Practice 11/14"
+author: "Olly Gill"
+date: "11/14/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(googlesheets4)
+library(broom)
+library(tidyverse)
+
+sheets_deauth()
+voting <- read_sheet("1QA_Xv9tAbKhwFdQpnVa2hTjhEdg5zAl4WY5EVanWSo0")
+```
+
+Relationship between dvote and dem_adv.
+```{r}
+voting %>%
+  ggplot(aes(x = dem_adv, y = dvote)) +
+  geom_jitter(height = 0.1, width = 0.1, alpha = 0.03) +
+  geom_smooth(method = "lm") +
+  labs(x = "Democratic Advertising", y = "Did You Vote Democratic?", title = "The Affect of Advertising on Voting")
+```
+
+Make a model of this relationship. Explain dvote with female.
+```{r}
+glm1 <- glm(formula = dvote ~ female, data = voting, family = "binomial")
+
+glm1 %>%
+  tidy()
+  
+```
+The estimate of the female variable shows us that if you are female, you will be 0.17 more likely to vote democratic. The T stat shows that it is significant.
+
+Make a graph between dvote and female.
+```{r}
+voting %>%
+  ggplot(aes(x = female, y = dvote)) +
+  geom_jitter(height = 0.1, width = 0.1, alpha = 0.03) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = FALSE) +
+  labs(x = "Female Gender", y = "Did You Vote Democratic?", title = "The Affect of Gender on Voting")
+```
+
